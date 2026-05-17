@@ -1,0 +1,39 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Local DB (ephemeral in cloud, don't ship)
+results.db
+
+# Results folder (screenshots)
+results/
+
+# Dev/test files
+sample_result.html
+roll_numbers.txt
+
+# Tesseract installer
+*.exe
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

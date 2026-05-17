@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReSCo - Result Scraper & Compiler</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="background-mesh"></div>
+    
+    <nav class="navbar">
+        <div class="logo">ReSCo<span>.</span></div>
+        <div class="nav-links">
+            <a href="#" class="active" data-tab="dashboard">Dashboard</a>
+            <a href="#" data-tab="scraper">New Job</a>
+            <a href="#" data-tab="analytics">Analytics</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="tab-content active">
+            <header class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>Overview</h1>
+                    <p>Results are stored for 2 hours before automatic deletion.</p>
+                </div>
+                <div class="header-actions" style="display: flex; gap: 1rem;">
+                    <a href="/api/download/excel" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        📊 Download Excel
+                    </a>
+                    <a href="/api/download/zip" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        📁 Download ZIP
+                    </a>
+                    <button id="btn-clear" class="btn-danger" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                        🗑️ Wipe All Data
+                    </button>
+                </div>
+            </header>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Students</h3>
+                    <div class="stat-value" id="stat-total">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Highest CGPA</h3>
+                    <div class="stat-value" id="stat-highest">0.0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Avg SGPA (Sem 1)</h3>
+                    <div class="stat-value" id="stat-avg">0.0</div>
+                </div>
+            </div>
+
+            <div class="card table-card">
+                <h2>Recent Results</h2>
+                <div class="table-responsive">
+                    <table id="results-table">
+                        <thead>
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Name</th>
+                                <th>Semester</th>
+                                <th>SGPA</th>
+                                <th>CGPA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scraper Job Section -->
+        <section id="scraper" class="tab-content">
+            <header class="section-header">
+                <h1>Start Scraping</h1>
+                <p>Enter roll numbers and select semesters to fetch results automatically.</p>
+            </header>
+            
+            <div class="card form-card">
+                <form id="scraper-form">
+                    <div class="form-group">
+                        <label for="roll-numbers">Roll Numbers</label>
+                        <textarea id="roll-numbers" placeholder="Enter roll numbers separated by commas or new lines. E.g., 2001, 2002, 2003" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Select Semesters</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-item"><input type="checkbox" name="semester" value="1" checked> Sem 1</label>
+                            <label class="checkbox-item"><input type="checkbox" name="semester" value="2"> Sem 2</label>
+                            <label class="checkbox-item"><input type="checkbox" name="semester" value="3"> Sem 3</label>
+                            <label class="checkbox-item"><input type="checkbox" name="semester" value="4"> Sem 4</label>
+                            <label class="checkbox-item"><input type="checkbox" name="semester" value="5"> Sem 5</label>
+                            <label class="checkbox-item"><input type="checkbox" name="semester" value="6"> Sem 6</label>
+                            <label class="checkbox-item"><input type="checkbox" name="semester" value="7"> Sem 7</label>
+                            <label class="checkbox-item"><input type="checkbox" name="semester" value="8"> Sem 8</label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" id="btn-start">Start Job</button>
+                </form>
+            </div>
+
+            <!-- Job Progress (Hidden by default) -->
+            <div class="card progress-card" id="progress-container" style="display: none;">
+                <h2>Job Progress</h2>
+                <div class="status-text" id="job-status-text">Starting...</div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="job-progress-fill"></div>
+                </div>
+                <div class="progress-stats">
+                    <span id="job-completed">0</span> / <span id="job-total">0</span> Completed
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="tab-content">
+            <header class="section-header">
+                <h1>Analytics</h1>
+                <p>Visualize student performance and trends.</p>
+            </header>
+
+            <div class="analytics-controls card">
+                <div class="form-group">
+                    <label for="search-roll">Student Roll Number</label>
+                    <div class="search-box">
+                        <input type="text" id="search-roll" placeholder="Enter Roll Number (e.g., 2001)">
+                        <button class="btn-secondary" id="btn-analyze">Analyze</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-status" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.5rem 1rem; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color);">
+                <span id="current-filter-text" style="font-weight: 600; color: var(--text-primary);">Showing: All Semesters</span>
+                <button id="btn-clear-filter" class="btn-secondary" style="display: none; padding: 0.3rem 0.8rem; font-size: 0.85rem;">Clear Filter</button>
+            </div>
+
+            <div class="charts-grid">
+                <div class="card chart-card">
+                    <h2>Performance Trend (SGPA/CGPA)</h2>
+                    <canvas id="studentChart"></canvas>
+                </div>
+                
+                <div class="card chart-card">
+                    <h2>Semester Overview (Batch Average)</h2>
+                    <canvas id="semesterChart"></canvas>
+                </div>
+
+                <div class="card chart-card">
+                    <h2>Grade Distribution (Batch)</h2>
+                    <canvas id="gradeChart"></canvas>
+                </div>
+
+                <div class="card table-card">
+                    <h2>Top 10 Performers (Leaderboard)</h2>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Roll No</th>
+                                    <th>Name</th>
+                                    <th>CGPA</th>
+                                </tr>
+                            </thead>
+                            <tbody id="toppers-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card chart-card" style="grid-column: 1 / -1;">
+                    <h2>Subject Difficulty Analysis (Fail Rate %)</h2>
+                    <canvas id="subjectChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
