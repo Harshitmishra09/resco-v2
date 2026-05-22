@@ -165,10 +165,39 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             renderStudentChart(data);
+            fetchStudentReappears(roll);
         } catch(error) {
             console.error("Analytics error", error);
         }
     });
+
+    async function fetchStudentReappears(roll) {
+        try {
+            const res = await fetch(`/api/analysis/student/${roll}/reappears`);
+            const data = await res.json();
+            
+            const reappearCard = document.getElementById('reappear-card');
+            const tbody = document.getElementById('reappear-body');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                reappearCard.style.display = 'none';
+            } else {
+                reappearCard.style.display = 'block';
+                data.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>Sem ${item.semester}</td>
+                        <td>${item.subject_name}</td>
+                        <td style="color: #ef4444; font-weight: 600;">${item.grade}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching reappear details", error);
+        }
+    }
 
     function renderStudentChart(data) {
         const ctx = document.getElementById('studentChart').getContext('2d');

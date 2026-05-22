@@ -88,7 +88,7 @@
                 <form id="scraper-form">
                     <div class="form-group">
                         <label for="roll-numbers">Roll Numbers</label>
-                        <textarea id="roll-numbers" placeholder="Enter roll numbers separated by commas or new lines. E.g., 2001, 2002, 2003" required></textarea>
+                        <textarea id="roll-numbers" placeholder="Enter roll numbers separated by commas, new lines, or as ranges. E.g., 2001, 2002-2005" required></textarea>
                     </div>
                     
                     <div class="form-group">
@@ -148,6 +148,24 @@
                 <div class="card chart-card">
                     <h2>Performance Trend (SGPA/CGPA)</h2>
                     <canvas id="studentChart"></canvas>
+                </div>
+
+                <div class="card table-card" id="reappear-card" style="display: none;">
+                    <h2>Re-appear / Backlog Details</h2>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Semester</th>
+                                    <th>Subject</th>
+                                    <th>Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reappear-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 
                 <div class="card chart-card">

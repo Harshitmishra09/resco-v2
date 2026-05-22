@@ -141,6 +141,19 @@ def get_student_performance(roll_number):
     conn.close()
     return [dict(ix) for ix in rows]
 
+def get_student_reappears(roll_number):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute('''
+        SELECT semester, subject_name, grade 
+        FROM subjects 
+        WHERE roll_number = ? AND grade IN ('F', 'Absent', 'Fail', 'Ab', 'RE')
+        ORDER BY semester ASC
+    ''', (str(roll_number),))
+    rows = c.fetchall()
+    conn.close()
+    return [dict(ix) for ix in rows]
+
 def get_semester_analysis(semester):
     conn = get_db()
     c = conn.cursor()

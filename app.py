@@ -27,7 +27,29 @@ def start_job():
     
     # Process roll numbers: split by comma, newline, or space
     import re
-    roll_numbers = [r.strip() for r in re.split(r'[,\n ]+', roll_numbers_str) if r.strip()]
+    raw_roll_numbers = [r.strip() for r in re.split(r'[,\n ]+', roll_numbers_str) if r.strip()]
+    
+    roll_numbers = []
+    for r in raw_roll_numbers:
+        if '-' in r:
+            parts = r.split('-')
+            if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
+                start = int(parts[0])
+                end = int(parts[1])
+                step = 1 if start <= end else -1
+                pad_len = len(parts[0]) if len(parts[0]) == len(parts[1]) else 0
+                for i in range(start, end + step, step):
+                    if pad_len > 0:
+                        roll_numbers.append(str(i).zfill(pad_len))
+                    else:
+                        roll_numbers.append(str(i))
+            else:
+                roll_numbers.append(r)
+        else:
+            roll_numbers.append(r)
+    
+    # Remove duplicates but keep order
+    roll_numbers = list(dict.fromkeys(roll_numbers))
     
     if not roll_numbers:
         return jsonify({"error": "No roll numbers provided"}), 400
@@ -50,6 +72,10 @@ def get_all_students():
 @app.route('/api/analysis/student/<roll_number>', methods=['GET'])
 def get_student_analysis(roll_number):
     return jsonify(db.get_student_performance(roll_number))
+
+@app.route('/api/analysis/student/<roll_number>/reappears', methods=['GET'])
+def get_student_reappears(roll_number):
+    return jsonify(db.get_student_reappears(roll_number))
 
 @app.route('/api/analysis/semester/<semester>', methods=['GET'])
 def get_semester_analysis(semester):
